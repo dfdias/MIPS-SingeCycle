@@ -26,10 +26,10 @@ use IEEE.STD_LOGIC_SIGNED.all;
 use IEEE.NUMERIC_STD.ALL;
 
 
-entity registers is				--will work as a dual port ram.
+entity register is				--will work as a dual port ram.
 
 port(
-	--action_trigger  	: 	in std_logic; --for multycycle
+	clk				 	: 	in std_logic; --for multycycle
 	RegWrite			:	in std_logic;  --control bit defines the data direction on the register
 
 	data_1_adrr			:	in std_logic_vector(4 downto 0);
@@ -43,9 +43,9 @@ port(
 
 	); 
 
-end registers;
+end register;
 
-architecture RTL of registers is
+architecture RTL of register is
 
 type reg is array (0 to 31 ) of std_logic_vector(5 downto 0);
 signal s_ram : st;
@@ -56,13 +56,16 @@ begin
 	s_addr1 <= data_1_adrr;
 	s_addr2 <= data_2_adrr;
 
-memory_IO: process(RegWrite)
+memory_IO: process(RegWrite,clk);
 begin	
-	if (RegWrite = '1')then
-		s_ram(write_adrr) <= write_data;
+	if rising_edge(clk) then
+		if (RegWrite = '1')then
+			s_ram(write_adrr) <= write_data;
+		end if;
 	else
 		data_1 <= s_ram(s_addr1);
 		data_2 <= s_ram(s_addr2);
+	
 	end if ;
 end process;
 

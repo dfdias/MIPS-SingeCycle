@@ -38,6 +38,8 @@ end SingleCycleCpu;
 
 architecture struct of SingleCycleCpu is
 
+    signal s_clk                                        :   std_logic;
+
 	signal s_aluOp										:	std_logic_vector(1 downto 0);
 	signal s_instruction 								: 	std_logic_vector(31 downto 0);
 	signal s_aluCtl 									: 	std_logic_vector(2 downto 0);
@@ -51,6 +53,11 @@ architecture struct of SingleCycleCpu is
 	signal s_RegDst										:	std_logic;
 	signal s_AluSrc										:	std_logic;
 	signal s_Branch										:	std_logic;
+	signal s_MemReg										:	std_logic;
+	signal s_MemWrite									:	std_logic;
+	signal s_MemRead									:	std_logic;	
+
+	signal s_memReadData								: 	std_logic_vector(31 downto 0);
 
 	signal s_data_1_addr, s_data_2_addr, s_write_addr 	:	std_logic_vector(4 downto 0);
 
@@ -61,7 +68,7 @@ architecture struct of SingleCycleCpu is
     signal s_shifted                                    :   std_logic_vector(31 downto 0);
 begin
 
-s_instruction <= (others => '0');
+
 
 --instruction  fetch area
 pc :	entity work.pc(b)
@@ -130,6 +137,7 @@ s_data_2_addr <= s_rt;
 
 registers	:	entity work.registers(RTL)
 	port map(
+	            clk => s_clk,
 				RegWrite => s_RegWrite,
 
 				data_1_adrr => s_data_1_addr,
@@ -151,6 +159,9 @@ control 	: entity work.control(Behavioral)
 				RegDst => s_RegDst,
 				AluSrc => s_AluSrc,
 				ALUop => s_aluOp,
+				MemToReg => s_MemReg,
+				MemRead => s_MemRead,
+				MemWrite => s_MemWrite,
 				Branch => s_Branch
 			);
 aluControl 	: entity work.aluControl(behavioral)
@@ -190,6 +201,30 @@ alu: entity work.alu(Behavioral)
 
 
 --memory access
+mem2reg: entity work.mux(b)
+	generic map (k => 31)
+	port map(
+				a => s_result,
+				b => s_memReadData,
+				s => s_MemReg,
+
+				f => s_write_data
+			);
+	
+--memory block(RTL)
+
+data_memory : entity work.data_memory(RTL)
+	port map(
+		clk => s_clk,
+
+		MemRead => s_MemRead,
+		MemWrite => s_MemWrite,
+
+		address => s_result(31 downto 16),
+
+		data_in => s_data2,
+		data_out => s_memReadData
+		);
 
 
 end architecture ; -- struct
