@@ -44,7 +44,6 @@ begin
 			s_ram(to_integer(unsigned(write_adrr))) <= write_data;
 		end if;
     end if;
-    
 		data_1 <= s_ram(to_integer(unsigned(s_addr1)));
 		data_2 <= s_ram(to_integer(unsigned(s_addr2)));
 end process;

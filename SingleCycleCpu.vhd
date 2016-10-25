@@ -31,7 +31,10 @@ entity SingleCycleCpu is
 port(
 	clk  	: in std_logic;
 
-	result	: out std_logic_vector(31 downto 0)
+	instruction : in std_logic_vector(31 downto 0);
+
+	result	: out std_logic_vector(31 downto 0);
+	
 	); 
 
 end SingleCycleCpu;
@@ -51,7 +54,7 @@ architecture struct of SingleCycleCpu is
 
 	signal s_RegWrite									:	std_logic;
 	signal s_RegDst										:	std_logic;
-	signal s_AluSrc										:	std_logic;
+	signal s_AluSrc										:	std_logic; 
 	signal s_Branch										:	std_logic;
 	signal s_MemReg										:	std_logic;
 	signal s_MemWrite									:	std_logic;
@@ -66,6 +69,9 @@ architecture struct of SingleCycleCpu is
 
 	signal s_adder4,s_alupc,s_pcmux,s_pc_out			:	std_logic_vector(31 downto 0);
     signal s_shifted                                    :   std_logic_vector(31 downto 0);
+
+    signal mem_adress_shifted							:	std_logic_vector(15 downto 0);
+
 begin
 
 
@@ -210,6 +216,15 @@ mem2reg: entity work.mux(b)
 
 				f => s_write_data
 			);
+
+--memory cheat
+
+memory_cheat : entity work.memory_cheat(b)
+	port map(
+			address_in => s_result,
+			address_out =>mem_adress_shifted
+			);
+
 	
 --memory block(RTL)
 
@@ -220,7 +235,7 @@ data_memory : entity work.data_memory(RTL)
 		MemRead => s_MemRead,
 		MemWrite => s_MemWrite,
 
-		address => s_result(31 downto 16),
+		address => mem_adress_shifted,
 
 		data_in => s_data2,
 		data_out => s_memReadData
