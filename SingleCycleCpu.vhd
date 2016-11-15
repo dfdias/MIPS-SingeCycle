@@ -31,10 +31,7 @@ entity SingleCycleCpu is
 port(
 	clk  	: in std_logic;
 
-	instruction : in std_logic_vector(31 downto 0);
-
-	result	: out std_logic_vector(31 downto 0);
-	
+	result	: out std_logic_vector(31 downto 0)
 	); 
 
 end SingleCycleCpu;
@@ -72,14 +69,16 @@ architecture struct of SingleCycleCpu is
 
     signal mem_adress_shifted							:	std_logic_vector(15 downto 0);
 
+
 begin
 
-
+	--s_instrucion <= instruction;
 
 --instruction  fetch area
 pc :	entity work.pc(b)
 		generic map(k => 31)
 		port map(
+				clk => s_clk,
 				addr_in => s_pcmux,
 				addr_out => s_pc_out
 				);
@@ -132,6 +131,7 @@ regdst_mux : entity work.mux(b)
 	generic map (k => 4)
 	port map(	a => s_rt,
 				b => s_rd,
+				--c => (others => '1'),---jum operation
 				s => s_RegDst,
 
 				f => s_write_addr

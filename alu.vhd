@@ -21,7 +21,8 @@
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
-use IEEE.STD_LOGIC_SIGNED.all;
+
+
 
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
@@ -60,9 +61,9 @@ begin
     elsif(aluOp = "0001") then 
         s_result <= op1 or op2;
     elsif(aluOp = "0010") then
-        s_result <= op1 + op2;
+        s_result <= std_logic_vector(unsigned(op1) + unsigned(op2));
     elsif(aluOp = "0110") then
-        s_result <= op1 - op2;
+        s_result <= std_logic_vector(signed(op1) - signed(op2));
     elsif(aluOp = "0111") then
     	s_result <= (others => '0');
     	if((op1 = op2) or (op1 > op2))then
